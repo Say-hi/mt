@@ -15,10 +15,11 @@ import dbConfig from './dbs/config'
 import passport from './interface/utils/passport'
 import users from './interface/users'
 import geo from './interface/geo'
+import search from './interface/search'
 
 const app = new Koa()
 
-app.keys= ['mt', 'keykeys']
+app.keys = ['mt', 'keykeys']
 app.proxy = true
 app.use(session({
   key: 'mt',
@@ -27,7 +28,7 @@ app.use(session({
 }))
 
 app.use(bodyParser({
-  extendsTypes: ['json','form', 'text']
+  extendsTypes: ['json', 'form', 'text']
 }))
 
 app.use(json())
@@ -62,6 +63,7 @@ async function start() {
 
   app.use(users.routes()).use(users.allowedMethods())
   app.use(geo.routes()).use(geo.allowedMethods())
+  app.use(search.routes()).use(search.allowedMethods())
 
   app.use((ctx) => {
     ctx.status = 200
