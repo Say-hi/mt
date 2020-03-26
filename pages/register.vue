@@ -58,6 +58,8 @@
 </template>
 
 <script>
+import axios from "axios";
+import CryptoJs from 'crypto-js'
 export default {
   layout: "blank",
   data() {
@@ -88,6 +90,14 @@ export default {
             trigger: "blur"
           }
         ],
+        code: [
+          {
+            required: true,
+            type: 'string',
+            message: '请输入正确的验证码',
+            trigger: 'blur'
+          }
+        ],
         pwd: [
           {
             required: true,
@@ -108,6 +118,7 @@ export default {
               } else if (value !== this.ruleForm.pwd) {
                 cb(new Error("两次输入密码不一样"));
               } else {
+                cb()
               }
             },
             trigger: "blur"
@@ -117,8 +128,78 @@ export default {
     };
   },
   methods: {
-    register() {},
-    sendMsg() {}
+    register() {
+      let self = this
+      this.$refs["ruleForm"].validate(valid => {
+       if (valid) {
+         axios.post('/users/signup', {
+           username: encodeURIComponent(self.ruleForm.name),
+           password: CryptoJs.MD5(self.ruleForm.pwd).toString(),
+           email: self.ruleForm.email,
+           code: self.ruleForm.code
+         }).then(({status, data}) => {
+           if (status === 200 && data && data.code === 0) {
+            location.href = '/login'
+           } else if (status === 200 && data && data.code !== 0) {
+             self.error = data.msg
+           } else {
+             self.error = `服务器出错，错误码：${status}`
+           }
+          //  setInterval(() => {
+          //     self.error = ''
+          //  }, 3000);
+         })
+       }
+      })
+    },
+    sendMsg() {
+      const self = this;
+      let namePass;
+      let emailPass;
+      if (self.timerid) {
+
+        self.$notify({
+          title: '提示',
+          message: '请休息一会儿再来吧',
+          duration: 2000
+        })
+
+        return false;
+      }
+      this.$refs["ruleForm"].validateField("name", valid => {
+        namePass = valid;
+      });
+      self.statusMsg = "";
+      if (namePass) {
+        console.log('need name')
+        return false;
+      }
+      this.$refs["ruleForm"].validateField("email", valid => {
+        emailPass = valid;
+      });
+
+      if (!namePass && !emailPass) {
+        axios.post("/users/verify", {
+            username: encodeURIComponent(self.ruleForm.name),
+            email: self.ruleForm.email
+          }).then(({ status, data }) => {
+            if (status === 200 && data && data.code === 0) {
+              let count = 60;
+              self.statusMsg = `验证码已发送,剩余${count--}秒可重新发送`;
+              self.timerid = setInterval(() => {
+                self.statusMsg = `验证码已发送,剩余${count--}秒可重新发送`;
+                if (count <= 0) {
+                  clearInterval(self.timerid);
+                  self.timerid = null
+                  self.statusMsg = ''
+                }
+              }, 1000);
+            } else {
+              self.statusMsg = data.msg;
+            }
+          });
+      }
+    }
   }
 };
 </script>
