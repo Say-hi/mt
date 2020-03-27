@@ -67,7 +67,7 @@ export default {
     let {status,data:{count,pois}}=await self.$axios.get('/search/resultsByKeywords',{
       params:{
         keyword:'景点',
-        city:self.$store.state.geo.position.city
+        city:self.$store.state.geo.position.city.replace('市', '')
       }
     })
     if(status===200&&count>0){
@@ -96,7 +96,7 @@ export default {
         let {status,data:{count,pois}}=await self.$axios.get('/search/resultsByKeywords',{
           params:{
             keyword,
-            city:self.$store.state.geo.position.city
+            city:self.$store.state.geo.position.city.replace('市', '')
           }
         })
         if(status===200&&count>0){
@@ -116,9 +116,10 @@ export default {
       }
     }
   },
-
 }
 </script>
 <style lang="scss">
     @import "@/assets/css/index/artistic.scss";
 </style>
+
+
