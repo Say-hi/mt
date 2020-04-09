@@ -70,9 +70,9 @@ export default {
       }, 150);
     },
     enter(e) {
-      console.log(e);
+      // console.log(e);
       this.kind = e.target.querySelector("i").className;
-      console.log(this.kind);
+      // console.log(this.kind);
     }
   },
   computed: {

@@ -23,11 +23,11 @@ router.post('/signup', async ctx =>{
   } = ctx.request.body
 
   if (code) {
-    console.log('code', code)
+    // console.log('code', code)
     const saveCode = await Store.hget(`nodeemail:${username}`,'code')
-    console.log('saveCode', saveCode)
+    // console.log('saveCode', saveCode)
     const saveExpire = await Store.hget(`nodeemail:${username}`, 'expire')
-    console.log('saveExpire', saveExpire)
+    // console.log('saveExpire', saveExpire)
     if (code === saveCode) {
       if (new Date().getTime() - saveExpire > 0) {
         ctx.body = {
@@ -119,8 +119,8 @@ router.post('/signin', async (ctx, next) => {
 router.post('/verify',async (ctx,next) => {
   let username = ctx.request.body.username
   const saveExpire = await Store.hget(`nodeemail:${username}`, 'expire')
-  console.log('saveExpire', saveExpire)
-  console.log(`${new Date().getTime()} **** ${saveExpire}`)
+  // console.log('saveExpire', saveExpire)
+  // console.log(`${new Date().getTime()} **** ${saveExpire}`)
   if (saveExpire && new Date().getTime() < saveExpire) {
     return ctx.body = {
       code: -1,
