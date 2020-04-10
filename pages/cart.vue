@@ -20,7 +20,16 @@
 import List from "@/components/cart/list";
 export default {
   methods: {
-    submit() {}
+    async submit() {
+      let result = await this.$axios.post("/order/createOrder", {
+        id: this.cartNo,
+        price: this.cart[0].price,
+        count: this.cart[0].count
+      });
+      if (result) {
+        window.location.href = "/order";
+      }
+    }
   },
   components: {
     List
